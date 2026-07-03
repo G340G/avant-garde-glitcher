@@ -1,6 +1,5 @@
 name: Generate Avant-Garde Video
 
-# This triggers the workflow manually from the GitHub Actions tab
 on:
   workflow_dispatch:
     inputs:
@@ -9,40 +8,36 @@ on:
         required: true
         default: 'input.mp4'
       pframe_intensity:
-        description: 'P-Frame pixel dragging intensity (0.0 - 1.0)'
+        description: 'Datamosh & macroblock corruption (0.0 - 1.0)'
         required: false
         default: '0.5'
       color_intensity:
-        description: 'Color shift / Chromatic aberration (0.0 - 1.0)'
+        description: 'Analog color separation depth (0.0 - 1.0)'
         required: false
         default: '0.4'
-      scanline_intensity:
-        description: 'Horizontal slice corruption (0.0 - 1.0)'
+      glitch_frequency:
+        description: 'Glitch rhythm frequency/chaos bursts (0.0 - 1.0)'
         required: false
-        default: '0.3'
+        default: '0.5'
 
 jobs:
   glitch-art-engine:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Check out the repository files (including your video)
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # 2. Set up Python environment
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-    # 3. Install dependencies required by OpenCV and NumPy
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    # 4. Run the glitch script with the variables provided in the GitHub UI
     - name: Process Video via Glitch Engine
       run: |
         python main.py \
@@ -50,9 +45,8 @@ jobs:
           -o "glitched_output.mp4" \
           --pframe ${{ github.event.inputs.pframe_intensity }} \
           --color ${{ github.event.inputs.color_intensity }} \
-          --scanline ${{ github.event.inputs.scanline_intensity }}
+          --frequency ${{ github.event.inputs.glitch_frequency }}
 
-    # 5. Upload the finalized video so you can download it
     - name: Upload Glitched Video Artifact
       uses: actions/upload-artifact@v4
       with:
